@@ -1,18 +1,18 @@
-[![Priiiiyo](https://telegra.ph/file/a19ce00c6a38e3f415d8a.jpg)](https://t.me/PriiiiyoMirrorLeechUpdates)
+[![iamSMMH](https://telegra.ph/file/09fed8481eb8c4f65d31c.jpg)](https://t.me/MirrorLeechBotUpdates)
 
-# Priiiiyo Mirror Leech Bot
-![GitHub Repo stars](https://img.shields.io/github/stars/PriiiiyoDevs/priiiiyo-mirror-leech-bot?color=blue&style=flat)
-![GitHub forks](https://img.shields.io/github/forks/PriiiiyoDevs/priiiiyo-mirrorbot?color=green&style=flat)
-![GitHub contributors](https://img.shields.io/github/contributors/PriiiiyoDevs/priiiiyo-mirror-leech-bot?style=flat)
-![GitHub watchers](https://img.shields.io/github/watchers/PriiiiyoDevs/priiiiyo-mirror-leech-bot)
+# Mirror Leech Bot
+![GitHub Repo stars](https://img.shields.io/github/stars/Appeza/mirror-leech-bot?color=blue&style=flat)
+![GitHub forks](https://img.shields.io/github/forks/Appeza/mirrorbot?color=green&style=flat)
+![GitHub contributors](https://img.shields.io/github/contributors/Appeza/mirror-leech-bot?style=flat)
+![GitHub watchers](https://img.shields.io/github/watchers/Appeza/mirror-leech-bot)
 ![Docker Pulls](https://img.shields.io/docker/pulls/priiiiyo/mega-sdk-python?label=Docker%20Pull)
-[![Channel](https://img.shields.io/badge/Join%20Channel-!-red)](https://t.me/PriiiiyoMirrorLeechUpdates)
+[![Channel](https://img.shields.io/badge/Join%20Channel-!-red)](https://t.me/MirrorLeechBotUpdates)
 
-**Priiiiyo Mirror Leech Bot** is a _multipurpose_ Telegram Bot written in Python for mirroring files on the Internet to our beloved Google Drive. Based on [python-aria-mirror-bot](https://github.com/lzzy12/python-aria-mirror-bot)
+**Mirror Leech Bot** is a _multipurpose_ Telegram Bot written in Python for mirroring files on the Internet to our beloved Google Drive. Based on [python-aria-mirror-bot](https://github.com/lzzy12/python-aria-mirror-bot)
 
 # Features:
 
-## By [PriiiiyoDevs](https://github.com/PriiiiyoDevs)
+## By [Appeza](https://github.com/Appeza)
 - qBittorrent
 - Rss feed reader
 - Select files from Torrent before downloading using qbittorrent
@@ -33,8 +33,8 @@
 - Random Service Account at startup
 - Mirror/Leech/Watch/Clone/Count/Del by reply
 - YT-DLP quality buttons
-- Search for torrents with Torrent Search API
-- Docker image support for `linux/amd64, linux/arm64, linux/arm/v7, linux/arm/v6` (**Note**: Use `anasty17/mltb-oracle:latest` for oracle or if u faced problem with arm64 docker run)
+- Search for torrents with Torrent Search API or with variable plugins using qBittorrent search 
+- Docker image support for `linux/amd64, linux/arm64, linux/arm/v7, linux/arm/v6` (**Note**: Use `priiiiyo/mega-sdk-python:latest` for oracle or if u faced problem with arm64 docker run)
 - Update bot at startup and with restart command using `UPSTREAM_REPO`
 - Clone/Zip/Unzip/Count from gdtot links (main script from [Yusuf](https://github.com/oxosec)) and delete first cloned file from main drive or TeamDrive
 - Many bugs have been fixed
@@ -75,7 +75,7 @@
 
 - Clone this repo:
 ```
-git clone https://github.com/PriiiiyoDevs/priiiiyo-mirror-leech-bot mirrorbot/ && cd mirrorbot
+git clone https://github.com/Appeza/mirror-leech-bot mirrorbot/ && cd mirrorbot
 ```
 - For Debian based distros
 ```
@@ -139,7 +139,7 @@ Fill up rest of the fields. Meaning of each field is discussed below:
 - `AUTHORIZED_CHATS`: Fill user_id and chat_id (not username) of groups/users you want to authorize. Separate them with space, Examples: `-0123456789 -1122334455 6915401739`.
 - `SUDO_USERS`: Fill user_id (not username) of users whom you want to give sudo permission. Separate them with space, Examples: `0123456789 1122334455 6915401739` (**NOTE**: If you want to save Sudo ID permanently without database, you must fill your Sudo Id here).
 - `IS_TEAM_DRIVE`: Set to `False` or leave it empty to get public google drive links else `True` so only who have access to your Folder/TeamDrive can open the links. `Bool`
-- `USE_SERVICE_ACCOUNTS`: (Leave empty if unsure) Whether to use Service Accounts or not. For this to work see [Using Service Accounts](https://github.com/anasty17/mirror-leech-telegram-bot#generate-service-accounts-what-is-service-account) section below.
+- `USE_SERVICE_ACCOUNTS`: (Leave empty if unsure) Whether to use Service Accounts or not. For this to work see [Using Service Accounts](https://github.com/appeza/mirror-leech-bot#generate-service-accounts-what-is-service-account) section below.
 - `INDEX_URL`: Refer to https://gitlab.com/ParveenBhadooOfficial/Google-Drive-Index The URL should not have any trailing '/' at the end.
 - `MEGA_API_KEY`: Mega.nz API key to mirror mega.nz links. Get it from [Mega SDK Page](https://mega.nz/sdk)
 - `MEGA_EMAIL_ID`: E-Mail ID used to sign up on mega.nz for using premium account (Leave though)
@@ -170,7 +170,8 @@ Fill up rest of the fields. Meaning of each field is discussed below:
 - `SEARCH_API_LINK`: Search api app link. Get your api from deploying this [repository](https://github.com/Ryuk-me/Torrents-Api). **Note**: Don't add slash at the end.
   - Supported Sites:
   >rarbg, 1337x, yts, etzv, tgx, torlock, piratebay, nyaasi, ettv
-- `PHPSESSID` and `CRYPT`: Cookies for gdtot google drive link generator. Follow these [steps](https://github.com/anasty17/mirror-leech-telegram-bot/tree/master#gdtot-cookies).
+- `PHPSESSID` and `CRYPT`: Cookies for gdtot google drive link generator. Follow these [steps](https://github.com/appeza/mirror-leech-bot/tree/master#gdtot-cookies).
+- `SEARCH_PLUGINS`: List of qBittorrent search plugins (github raw links). I have added some plugins, you can remove/add plugins as you want. Main Source: [qBittorrent Search Plugins (Official/Unofficial)](https://github.com/qbittorrent/search-plugins/wiki/Unofficial-search-plugins).
 
 Three buttons are already added including Drive Link, Index Link, and View Link, you can add extra buttons, if you don't know what are the below entries, simply leave them empty.
 - `BUTTON_FOUR_NAME`:
@@ -277,7 +278,7 @@ sudo docker image prune -a
 ------
 
 ## Deploying on Heroku
-<p><a href="https://github.com/PriiiiyoDevs/priiiiyo-mirror-leech-bot/tree/heroku"> <img src="https://img.shields.io/badge/Deploy%20Guide-blueviolet?style=for-the-badge&logo=heroku" width="170""/></a></p>
+<p><a href="https://github.com/Appeza/mirror-leech-bot/tree/heroku"> <img src="https://img.shields.io/badge/Deploy%20Guide-blueviolet?style=for-the-badge&logo=heroku" width="170""/></a></p>
 
 ------
 
@@ -479,7 +480,7 @@ To Clone or Leech gdtot link follow these steps:
 # Credits
 
 Thanks to:
-- [`priiiiyo`](https://github.com/priiiiyo) for custom mod 👨‍🦰
+- [`iamSMMH`](https://github.com/iamSMMH) for custom mod 👨‍🦰
 - [`out386`](https://github.com/out386) heavily inspired from his Telegram Bot written in Typescript
 - [`Izzy12`](https://github.com/lzzy12) for build up of this bot from scratch
 - [`jaskaranSM`](https://github.com/jaskaranSM) for build up of this bot from scratch
@@ -492,4 +493,4 @@ Thanks to:
 - [`yash-dk`](https://github.com/yash-dk) for implementation of qBittorrent on Python
 - [`xyou365`](https://github.com/xyou365) for Service Accounts script
 
-And many more people who aren't mentioned here, but can be found in [Contributors](https://github.com/PriiiiyoDevs/priiiiyo-mirrorbot/graphs/contributors).
+And many more people who aren't mentioned here, but can be found in [Contributors](https://github.com/Appeza/mirror-leech-bot/graphs/contributors).
