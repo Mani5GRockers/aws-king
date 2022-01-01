@@ -30,7 +30,7 @@ class _BotCommands:
         self.DeleteCommand = 'del'
         self.ShellCommand = 'shell'
         self.ExecHelpCommand = 'exechelp'
-        self.LeechSetCommand = 'leechset'
+        self.LeechSetCommand = 'leeset'
         self.SetThumbCommand = 'setthumb'
         self.LeechCommand = 'leech'
         self.UnzipLeechCommand = 'unzlee'
