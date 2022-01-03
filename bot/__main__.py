@@ -242,7 +242,7 @@ botcmds = [
     ]
 
 def main():
-    # bot.set_my_commands(botcmds)
+    bot.set_my_commands(botcmds)
     fs_utils.start_cleanup()
     if IS_VPS:
         asyncio.run(start_server_async(PORT))
