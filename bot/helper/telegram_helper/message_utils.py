@@ -151,7 +151,7 @@ def update_all_messages():
     with status_reply_dict_lock:
         for chat_id in list(status_reply_dict.keys()):
             if status_reply_dict[chat_id] and msg != status_reply_dict[chat_id].text:
-                if buttons(msg) == "":
+                if buttons == "":
                     msg = "Starting DL"
                 try:
                     keyboard = [[InlineKeyboardButton("REFRESH", callback_data=str(ONE)),
