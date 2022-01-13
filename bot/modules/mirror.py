@@ -208,7 +208,7 @@ class MirrorListener:
                 else:
                     update_all_messages()
             count = len(files)
-            msg = f'<b>Name: </b><code>{link}</code>\n\n'
+            msg = f'<b>Filename: </b><code>{link}</code>\n\n'
             msg += f'<b>Size: </b>{get_readable_file_size(size)}\n'
             msg += f'<b>Total Files: </b>{count}'
             if typ != 0:
@@ -233,7 +233,7 @@ class MirrorListener:
             return
 
         with download_dict_lock:
-            msg = f'<b>Name: </b><code>{download_dict[self.uid].name()}</code>\n\n<b>Size: </b>{size}'
+            msg = f'<b>Filename: </b><code>{download_dict[self.uid].name()}</code>\n\n<b>Size: </b>{size}'
             msg += f'\n\n<b>Type: </b>{typ}'
             if ospath.isdir(f'{DOWNLOAD_DIR}/{self.uid}/{download_dict[self.uid].name()}'):
                 msg += f'\n<b>SubFolders: </b>{folders}'
@@ -262,7 +262,7 @@ class MirrorListener:
                 buttons.buildbutton(f"{BUTTON_FIVE_NAME}", f"{BUTTON_FIVE_URL}")
             if BUTTON_SIX_NAME is not None and BUTTON_SIX_URL is not None:
                 buttons.buildbutton(f"{BUTTON_SIX_NAME}", f"{BUTTON_SIX_URL}")
-        msg += f'\n\n<b>Uploaded By: </b>{self.tag}'
+        msg += f'\n\n<b>#Uploaded By </b>{self.tag}'
         if self.isQbit and QB_SEED:
            return sendMarkup(msg, self.bot, self.update, InlineKeyboardMarkup(buttons.build_menu(2)))
         else:
