@@ -420,7 +420,7 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
             else:
                 link = file.get_file().file_path
 
-else:
+    else:
         tag = None
     if not bot_utils.is_url(link) and not bot_utils.is_magnet(link):
         if isTar:
