@@ -151,7 +151,7 @@ def update_all_messages():
     with status_reply_dict_lock:
         for chat_id in list(status_reply_dict.keys()):
             if status_reply_dict[chat_id] and msg != status_reply_dict[chat_id].text:
-                if buttons == "":
+                if len(msg) == 0:
                     msg = "Starting DL"
                 try:
                     keyboard = [[InlineKeyboardButton("REFRESH", callback_data=str(ONE)),
@@ -175,10 +175,10 @@ def sendStatusMessage(msg, bot):
             except Exception as e:
                 LOGGER.error(str(e))
                 del status_reply_dict[msg.message.chat.id]
-        if buttons == "":
-            message = sendMessage(progress, bot, msg)
-        else:
-            message = sendMarkup(progress, bot, msg, buttons)
+                pass
+        if len(progress) == 0:
+            progress = "Starting DL"
+        message = sendMessage(progress, bot, msg)
         status_reply_dict[msg.message.chat.id] = message
 
 ONE, TWO, THREE = range(3)
