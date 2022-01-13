@@ -538,7 +538,7 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
         time.sleep(1)
         sendtextlog(f"{uname} has sent - \n\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n<code>{link}</code>\n\nUser ID : {uid}\n\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", bot, update)
         
-else:
+    else:
     bot_start = f"http://t.me/{b_uname}?start=start"
     mssg = sendMessage("<b>Processing Your URI...</b>", bot, update)
     time.sleep(2)
