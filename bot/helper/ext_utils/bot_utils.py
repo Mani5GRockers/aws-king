@@ -10,7 +10,7 @@ from telegram.ext import CallbackQueryHandler
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime
-from bot.helper.telegram_helper.button_build import ButtonMaker, button_build, message_utils
+from bot.helper.telegram_helper.button_build import ButtonMaker, message_utils
 
 MAGNET_REGEX = r"magnet:\?xt=urn:btih:[a-zA-Z0-9]*"
 
