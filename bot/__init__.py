@@ -144,6 +144,7 @@ except:
 try:
     BOT_TOKEN = getConfig('BOT_TOKEN')
     parent_id = getConfig('GDRIVE_FOLDER_ID')
+    CHAT_NAME = getConfig('CHAT_NAME')
     DOWNLOAD_DIR = getConfig('DOWNLOAD_DIR')
     if not DOWNLOAD_DIR.endswith("/"):
         DOWNLOAD_DIR = DOWNLOAD_DIR + '/'
@@ -152,6 +153,9 @@ try:
     AUTO_DELETE_MESSAGE_DURATION = int(getConfig('AUTO_DELETE_MESSAGE_DURATION'))
     TELEGRAM_API = getConfig('TELEGRAM_API')
     TELEGRAM_HASH = getConfig('TELEGRAM_HASH')
+    LOG_CHANNEL_ID = getConfig('LOG_CHANNEL_ID')
+    LOG_CHANNEL_LINK = getConfig('LOG_CHANNEL_LINK')
+    LOG_SEND_TEXT = getConfig('LOG_SEND_TEXT')
 except KeyError as e:
     LOGGER.error("One or more env variables missing! Exiting now")
     exit(1)
