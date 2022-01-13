@@ -540,7 +540,7 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
         if len(Interval) == 0:
                     Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
 
-else:
+    else:
         bot_start = f"http://t.me/{b_uname}?start=start"
         mssg = sendMessage("<b>Processing Your URI...</b>", bot, update)
         time.sleep(2)
