@@ -507,13 +507,7 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
         sendMessage(f"𝗤𝗯𝗶𝘁𝘁𝗼𝗿𝗿𝗲𝗻𝘁 𝗦𝘁𝗮𝗿𝘁𝗲𝗱\n\n𝗨𝘀𝗲𝗿: {uname}\n\n𝗡𝗼𝘁𝗲: 𝚀𝚋𝚒𝚝 𝙽𝚘𝚝 𝚝𝚘𝚘 𝚂𝚝𝚊𝚋𝚕𝚎 𝚋𝚞𝚝 𝚝𝚛𝚢 𝚢𝚘𝚞𝚛 𝚕𝚞𝚌𝚔", bot, update)
         sendtextlog(f"𝗟𝗢𝗚𝗚𝗘𝗥\n\n𝑼𝒔𝒆𝒓: {uname}\n𝑼𝒔𝒆𝒓 𝑰𝑫: {uid}\n\n𝑳𝒊𝒏𝒌 𝑺𝒆𝒏𝒅𝒆𝒅:\n<code>{link}</code>", bot, update)
 
-    else:
-        Thread(target=add_download, args=(link, f'{DOWNLOAD_DIR}{listener.uid}/', listener, name)).start()
-        sendStatusMessage(update, bot)
-        editMessage(f"<b>Hei {uname}</b>\n\n<b>Your Requested Torrent File Has Been Added To The Status</b>\n\n<b>Use /{BotCommands.StatusCommand} To Check Your Progress</b>\n")
-        time.sleep(1)
-        sendtextlog(f"𝗟𝗢𝗚𝗚𝗘𝗥\n\n𝑼𝒔𝒆𝒓: {uname}\n𝑼𝒔𝒆𝒓 𝑰𝑫: {uid}\n\n𝑳𝒊𝒏𝒌 𝑺𝒆𝒏𝒅𝒆𝒅:\n<code>{link}</code>", bot, update)
-        
+
     else:
         bot_start = f"http://t.me/{b_uname}?start=start"
         Thread(target=add_aria2c_download, args=(link, f'{DOWNLOAD_DIR}{listener.uid}/', listener, name)).start()
