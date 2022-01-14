@@ -49,7 +49,7 @@ def sendMarkup(text: str, bot, update: Update, reply_markup: InlineKeyboardMarku
 
 def sendLog(text: str, bot, update: Update, reply_markup: InlineKeyboardMarkup):
     try:
-        return bot.send_message(f"{LOG_CHANNEL}",
+        return bot.send_message(f"{LOG_CHANNEL_ID}",
                              reply_to_message_id=update.message.message_id,
                              text=text, disable_web_page_preview=True, reply_markup=reply_markup, allow_sending_without_reply=True, parse_mode='HTMl')
     except Exception as e:
