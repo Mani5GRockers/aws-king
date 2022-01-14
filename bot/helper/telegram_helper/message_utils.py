@@ -15,7 +15,7 @@ from pyrogram.errors import FloodWait
 
 from bot import *
 from bot import AUTO_DELETE_MESSAGE_DURATION, LOGGER, OWNER_ID, status_reply_dict, status_reply_dict_lock, \
-                Interval, DOWNLOAD_STATUS_UPDATE_INTERVAL, RSS_CHAT_ID, rss_session, bot
+                Interval, DOWNLOAD_STATUS_UPDATE_INTERVAL, LOG_CHANNEL_ID, LOG_SEND_TEXT, LOG_CHANNEL_LINK, RSS_CHAT_ID, rss_session, bot
 from bot.helper.ext_utils.bot_utils import get_readable_message, get_readable_file_size, get_readable_time, progress_bar, MirrorStatus, setInterval
 from telegram.error import TimedOut, BadRequest
 
