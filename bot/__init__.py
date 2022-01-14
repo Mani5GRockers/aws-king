@@ -476,6 +476,7 @@ try:
             logging.error(f"ACCOUNTS_ZIP_URL: {e}")
             raise KeyError
         srun(["unzip", "-q", "-o", "accounts.zip"])
+        srun(["chmod", "-R", "777", "accounts"])
         osremove("accounts.zip")
 except KeyError:
     pass
