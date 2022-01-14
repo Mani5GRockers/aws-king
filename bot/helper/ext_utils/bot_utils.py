@@ -9,7 +9,7 @@ from telegram import InlineKeyboardMarkup
 from telegram.ext import CallbackQueryHandler
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime
+from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, FINISHED_PROGRESS_STR, UNFINISHED_PROGRESS_STR, botStartTime
 from bot.helper.telegram_helper import message_utils
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
