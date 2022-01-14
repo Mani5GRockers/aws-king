@@ -2,25 +2,30 @@ import logging
 import os
 import threading
 import time
+import random
+import socket
+import string
 import subprocess
 import requests
-import socket
 import faulthandler
 import aria2p
-import psycopg2
-import json
 import qbittorrentapi as qba
 import telegram.ext as tg
 
+from os import remove as osremove, path as ospath, environ
+from requests import get as rget
+from json import loads as jsnloads
+from subprocess import Popen, run as srun
+from time import sleep, time
+from threading import Thread, Lock
 from pyrogram import Client
-from psycopg2 import Error
 from dotenv import load_dotenv
 
 faulthandler.enable()
 
 socket.setdefaulttimeout(600)
 
-botStartTime = time.time()
+botStartTime = time()
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     handlers=[logging.FileHandler('log.txt'), logging.StreamHandler()],
@@ -28,19 +33,17 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 LOGGER = logging.getLogger(__name__)
 
-
 load_dotenv('config.env', override=True)
 
-
 def getConfig(name: str):
-    return os.environ[name]
+    return environ[name]
 
 try:
     NETRC_URL = getConfig('NETRC_URL')
     if len(NETRC_URL) == 0:
         raise KeyError
     try:
-        res = requests.get(NETRC_URL)
+        res = rget(NETRC_URL)
         if res.status_code == 200:
             with open('.netrc', 'wb+') as f:
                 f.write(res.content)
@@ -48,7 +51,7 @@ try:
         else:
             logging.error(f"Failed to download .netrc {res.status_code}")
     except Exception as e:
-        logging.error(str(e))
+        logging.error(f"NETRC_URL: {e}")
 except KeyError:
     pass
 try:
@@ -58,34 +61,22 @@ try:
 except KeyError:
     SERVER_PORT = 80
 
-PORT = os.environ.get('PORT', SERVER_PORT)
-web = subprocess.Popen([f"gunicorn wserver:start_server --bind 0.0.0.0:{PORT} --worker-class aiohttp.GunicornWebWorker"], shell=True)
-alive = subprocess.Popen(["python3", "alive.py"])
-nox = subprocess.Popen(["qbittorrent-nox", "--profile=."])
-if not os.path.exists('.netrc'):
-    subprocess.run(["touch", ".netrc"])
-subprocess.run(["cp", ".netrc", "/root/.netrc"])
-subprocess.run(["chmod", "600", ".netrc"])
-subprocess.run(["chmod", "+x", "aria.sh"])
-subprocess.run(["./aria.sh"], shell=True)
-time.sleep(0.5)
+PORT = environ.get('PORT', SERVER_PORT)
+web = Popen([f"gunicorn wserver:start_server --bind 0.0.0.0:{PORT} --worker-class aiohttp.GunicornWebWorker"], shell=True)
+alive = Popen(["python3", "alive.py"])
+nox = Popen(["qbittorrent-nox", "--profile=."])
+if not ospath.exists('.netrc'):
+    srun(["touch", ".netrc"])
+srun(["cp", ".netrc", "/root/.netrc"])
+srun(["chmod", "600", ".netrc"])
+srun(["chmod", "+x", "aria.sh"])
+srun(["./aria.sh"], shell=True)
+sleep(0.5)
 
 Interval = []
 DRIVES_NAMES = []
 DRIVES_IDS = []
 INDEX_URLS = []
-
-def mktable():
-    try:
-        conn = psycopg2.connect(DB_URI)
-        cur = conn.cursor()
-        sql = "CREATE TABLE users (uid bigint, sudo boolean DEFAULT FALSE);"
-        cur.execute(sql)
-        conn.commit()
-        logging.info("Table Created!")
-    except Error as e:
-        logging.error(e)
-        exit(1)
 
 try:
     if bool(getConfig('_____REMOVE_THIS_LINE_____')):
@@ -107,52 +98,39 @@ def get_client() -> qba.TorrentsAPIMixIn:
 
 """
 trackers = subprocess.check_output(["curl -Ns https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/all.txt https://ngosang.github.io/trackerslist/trackers_all_http.txt https://newtrackon.com/api/all | awk '$0'"], shell=True).decode('utf-8')
+
 trackerslist = set(trackers.split("\n"))
 trackerslist.remove("")
 trackerslist = "\n\n".join(trackerslist)
 get_client().application.set_preferences({"add_trackers":f"{trackerslist}"})
 """
-def aria2c_init():
-    try:
-        if not os.path.isfile(".restartmsg"):
-            logging.info("Initializing Aria2c")
-            link = "https://releases.ubuntu.com/21.10/ubuntu-21.10-desktop-amd64.iso.torrent"
-            path = "/usr/src/app/"
-            aria2.add_uris([link], {'dir': path})
-            time.sleep(3)
-            downloads = aria2.get_downloads()
-            time.sleep(30)
-            for download in downloads:
-                aria2.remove([download], force=True, files=True)
-    except Exception as e:
-        logging.error(f"Aria2c initializing error: {e}")
-        pass
-
-threading.Thread(target=aria2c_init).start()
 
 DOWNLOAD_DIR = None
 BOT_TOKEN = None
 BOT_NO = ""
 
-download_dict_lock = threading.Lock()
-status_reply_dict_lock = threading.Lock()
+download_dict_lock = Lock()
+status_reply_dict_lock = Lock()
 # Key: update.effective_chat.id
 # Value: telegram.Message
 status_reply_dict = {}
 # Key: update.message.message_id
 # Value: An object of Status
 download_dict = {}
-# Stores list of users and chats the bot is authorized to use in
+# key: rss_title
+# value: [rss_feed, last_link, last_title]
+rss_dict = {}
+
 AUTHORIZED_CHATS = set()
 SUDO_USERS = set()
 AS_DOC_USERS = set()
 AS_MEDIA_USERS = set()
-if os.path.exists('authorized_chats.txt'):
+if ospath.exists('authorized_chats.txt'):
     with open('authorized_chats.txt', 'r+') as f:
         lines = f.readlines()
         for line in lines:
             AUTHORIZED_CHATS.add(int(line.split()[0]))
-if os.path.exists('sudo_users.txt'):
+if ospath.exists('sudo_users.txt'):
     with open('sudo_users.txt', 'r+') as f:
         lines = f.readlines()
         for line in lines:
@@ -172,9 +150,13 @@ try:
 except:
     pass
 try:
+    BOT_NO = getConfig('BOT_NO')
+except KeyError:
+    BOT_NO = ""
+try:
     BOT_TOKEN = getConfig('BOT_TOKEN')
-    CHAT_NAME = getConfig('CHAT_NAME')
     parent_id = getConfig('GDRIVE_FOLDER_ID')
+    CHAT_NAME = getConfig('CHAT_NAME')
     DOWNLOAD_DIR = getConfig('DOWNLOAD_DIR')
     if not DOWNLOAD_DIR.endswith("/"):
         DOWNLOAD_DIR = DOWNLOAD_DIR + '/'
@@ -182,45 +164,53 @@ try:
     OWNER_ID = int(getConfig('OWNER_ID'))
     AUTO_DELETE_MESSAGE_DURATION = int(getConfig('AUTO_DELETE_MESSAGE_DURATION'))
     TELEGRAM_API = getConfig('TELEGRAM_API')
-    TELEGRAM_HASH = getConfig('TELEGRAM_HASH')   
+    TELEGRAM_HASH = getConfig('TELEGRAM_HASH')
     LOG_CHANNEL_ID = getConfig('LOG_CHANNEL_ID')
     LOG_CHANNEL_LINK = getConfig('LOG_CHANNEL_LINK')
     LOG_SEND_TEXT = getConfig('LOG_SEND_TEXT')
-    UPSTREAM_REPO = getConfig('UPSTREAM_REPO')
-    UPSTREAM_BRANCH = getConfig('UPSTREAM_BRANCH')
 except KeyError as e:
     LOGGER.error("One or more env variables missing! Exiting now")
     exit(1)
+
+LOGGER.info("Generating BOT_STRING_SESSION")
+app = Client('pyrogram', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN, no_updates=True)
+
+try:
+    USER_STRING_SESSION = getConfig('USER_STRING_SESSION')
+    if len(USER_STRING_SESSION) == 0:
+        raise KeyError
+except KeyError:
+    USER_STRING_SESSION = None
+
+if USER_STRING_SESSION is not None:
+    rss_session = Client(USER_STRING_SESSION, api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH)
+else:
+    rss_session = None
+
+def aria2c_init():
+    try:
+        logging.info("Initializing Aria2c")
+        link = "https://releases.ubuntu.com/21.10/ubuntu-21.10-desktop-amd64.iso.torrent"
+        aria2.add_uris([link], {'dir': DOWNLOAD_DIR})
+        sleep(3)
+        downloads = aria2.get_downloads()
+        sleep(30)
+        for download in downloads:
+            aria2.remove([download], force=True, files=True)
+    except Exception as e:
+        logging.error(f"Aria2c initializing error: {e}")
+        pass
+
+if not ospath.isfile(".restartmsg"):
+    Thread(target=aria2c_init).start()
+    sleep(1)
+
 try:
     DB_URI = getConfig('DATABASE_URL')
     if len(DB_URI) == 0:
         raise KeyError
 except KeyError:
     DB_URI = None
-if DB_URI is not None:
-    try:
-        conn = psycopg2.connect(DB_URI)
-        cur = conn.cursor()
-        sql = "SELECT * from users;"
-        cur.execute(sql)
-        rows = cur.fetchall()  #returns a list ==> (uid, sudo)
-        for row in rows:
-            AUTHORIZED_CHATS.add(row[0])
-            if row[1]:
-                SUDO_USERS.add(row[0])
-    except Error as e:
-        if 'relation "users" does not exist' in str(e):
-            mktable()
-        else:
-            LOGGER.error(e)
-            exit(1)
-    finally:
-        cur.close()
-        conn.close()
-
-LOGGER.info("Generating USER_SESSION_STRING")
-app = Client('pyrogram', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN, workers=343)
-
 try:
     TG_SPLIT_SIZE = getConfig('TG_SPLIT_SIZE')
     if len(TG_SPLIT_SIZE) == 0 or int(TG_SPLIT_SIZE) > 2097151000:
@@ -254,23 +244,13 @@ except KeyError:
     MEGA_EMAIL_ID = None
     MEGA_PASSWORD = None
 try:
-    HEROKU_API_KEY = getConfig('HEROKU_API_KEY')
-    HEROKU_APP_NAME = getConfig('HEROKU_APP_NAME')
-    if len(HEROKU_API_KEY) == 0 or len(HEROKU_APP_NAME) == 0:
-        HEROKU_API_KEY = None
-        HEROKU_APP_NAME = None
-except KeyError:
-    HEROKU_API_KEY = None
-    HEROKU_APP_NAME = None
-try:
     UPTOBOX_TOKEN = getConfig('UPTOBOX_TOKEN')
     if len(UPTOBOX_TOKEN) == 0:
         raise KeyError
 except KeyError:
-    logging.warning('UPTOBOX_TOKEN not provided!')
     UPTOBOX_TOKEN = None
 try:
-    INDEX_URL = getConfig('INDEX_URL')
+    INDEX_URL = getConfig('INDEX_URL').rstrip("/")
     if len(INDEX_URL) == 0:
         raise KeyError
     else:
@@ -279,11 +259,17 @@ except KeyError:
     INDEX_URL = None
     INDEX_URLS.append(None)
 try:
-    SEARCH_API_LINK = getConfig('SEARCH_API_LINK')
+    SEARCH_API_LINK = getConfig('SEARCH_API_LINK').rstrip("/")
     if len(SEARCH_API_LINK) == 0:
         raise KeyError
 except KeyError:
     SEARCH_API_LINK = None
+try:
+    RSS_COMMAND = getConfig('RSS_COMMAND')
+    if len(RSS_COMMAND) == 0:
+        raise KeyError
+except KeyError:
+    RSS_COMMAND = None
 try:
     TORRENT_DIRECT_LIMIT = getConfig('TORRENT_DIRECT_LIMIT')
     if len(TORRENT_DIRECT_LIMIT) == 0:
@@ -316,6 +302,22 @@ try:
         ZIP_UNZIP_LIMIT = float(ZIP_UNZIP_LIMIT)
 except KeyError:
     ZIP_UNZIP_LIMIT = None
+try:
+    RSS_CHAT_ID = getConfig('RSS_CHAT_ID')
+    if len(RSS_CHAT_ID) == 0:
+        raise KeyError
+    else:
+        RSS_CHAT_ID = int(RSS_CHAT_ID)
+except KeyError:
+    RSS_CHAT_ID = None
+try:
+    RSS_DELAY = getConfig('RSS_DELAY')
+    if len(RSS_DELAY) == 0:
+        raise KeyError
+    else:
+        RSS_DELAY = int(RSS_DELAY)
+except KeyError:
+    RSS_DELAY = 900
 try:
     BUTTON_FOUR_NAME = getConfig('BUTTON_FOUR_NAME')
     BUTTON_FOUR_URL = getConfig('BUTTON_FOUR_URL')
@@ -384,55 +386,24 @@ except KeyError:
     SHORTENER = None
     SHORTENER_API = None
 try:
-    TIMEZONE = getConfig('TIMEZONE')
-    if len(TIMEZONE) == 0:
-        TIMEZONE = None
-except KeyError:
-    TIMEZONE = 'Asia/Kuala_Lumpur'
-try:
-    BOT_USERNAME = getConfig('BOT_USERNAME')
-    if len(BOT_USERNAME) == 0:
-        BOT_USERNAME = None
-except KeyError:
-    BOT_USERNAME = '@pmirror_bot'
-try:
-    BOT_NAME = getConfig('BOT_NAME')
-    if len(BOT_NAME) == 0:
-        BOT_NAME = None
-except KeyError:
-    BOT_NAME = 'P-Mιɾɾσɾ'
-try:
-    IMAGE_URL = getConfig('IMAGE_URL')
-    if len(IMAGE_URL) == 0:
-        IMAGE_URL = None
-except KeyError:
-    IMAGE_URL = 'https://telegra.ph/file/b5d9a2910d65ce0596f59.jpg'
-try:
     FINISHED_PROGRESS_STR = getConfig('FINISHED_PROGRESS_STR')
     if len(FINISHED_PROGRESS_STR) == 0:
-        FINISHED_PROGRESS_STR = '■'
+        FINISHED_PROGRESS_STR = '▓'
 except KeyError:
-    FINISHED_PROGRESS_STR = '■'
+    FINISHED_PROGRESS_STR = '▓'
 try:
     UNFINISHED_PROGRESS_STR = getConfig('UNFINISHED_PROGRESS_STR')
     if len(UNFINISHED_PROGRESS_STR) == 0:
-        UNFINISHED_PROGRESS_STR = '□'
+        UNFINISHED_PROGRESS_STR = '░'
 except KeyError:
-    UNFINISHED_PROGRESS_STR = '□'
-try:
-    CHAT_ID = getConfig('CHAT_ID')
-    DELAY = int(getConfig('DELAY'))
-    INIT_FEEDS = getConfig('INIT_FEEDS')
-    CUSTOM_MESSAGES = getConfig('CUSTOM_MESSAGES')        
-except:
-    pass
+    UNFINISHED_PROGRESS_STR = '░'
 try:
     IGNORE_PENDING_REQUESTS = getConfig("IGNORE_PENDING_REQUESTS")
     IGNORE_PENDING_REQUESTS = IGNORE_PENDING_REQUESTS.lower() == 'true'
 except KeyError:
     IGNORE_PENDING_REQUESTS = False
 try:
-    BASE_URL = getConfig('BASE_URL_OF_BOT')
+    BASE_URL = getConfig('BASE_URL_OF_BOT').rstrip("/")
     if len(BASE_URL) == 0:
         raise KeyError
 except KeyError:
@@ -454,6 +425,11 @@ try:
 except KeyError:
     EQUAL_SPLITS = False
 try:
+    QB_SEED = getConfig('QB_SEED')
+    QB_SEED = QB_SEED.lower() == 'true'
+except KeyError:
+    QB_SEED = False
+try:
     CUSTOM_FILENAME = getConfig('CUSTOM_FILENAME')
     if len(CUSTOM_FILENAME) == 0:
         raise KeyError
@@ -472,7 +448,7 @@ try:
     if len(TOKEN_PICKLE_URL) == 0:
         raise KeyError
     try:
-        res = requests.get(TOKEN_PICKLE_URL)
+        res = rget(TOKEN_PICKLE_URL)
         if res.status_code == 200:
             with open('token.pickle', 'wb+') as f:
                 f.write(res.content)
@@ -480,7 +456,7 @@ try:
         else:
             logging.error(f"Failed to download token.pickle, link got HTTP response: {res.status_code}")
     except Exception as e:
-        logging.error(str(e))
+        logging.error(f"TOKEN_PICKLE_URL: {e}")
 except KeyError:
     pass
 try:
@@ -489,7 +465,7 @@ try:
         raise KeyError
     else:
         try:
-            res = requests.get(ACCOUNTS_ZIP_URL)
+            res = rget(ACCOUNTS_ZIP_URL)
             if res.status_code == 200:
                 with open('accounts.zip', 'wb+') as f:
                     f.write(res.content)
@@ -497,10 +473,11 @@ try:
             else:
                 logging.error(f"Failed to download accounts.zip, link got HTTP response: {res.status_code}")
         except Exception as e:
-            logging.error(str(e))
+            logging.error(f"ACCOUNTS_ZIP_URL: {e}")
             raise KeyError
-        subprocess.run(["unzip", "-q", "-o", "accounts.zip"])
-        os.remove("accounts.zip")
+        srun(["unzip", "-q", "-o", "accounts.zip"])
+        srun(["chmod", "-R", "777", "accounts"])
+        osremove("accounts.zip")
 except KeyError:
     pass
 try:
@@ -508,7 +485,7 @@ try:
     if len(MULTI_SEARCH_URL) == 0:
         raise KeyError
     try:
-        res = requests.get(MULTI_SEARCH_URL)
+        res = rget(MULTI_SEARCH_URL)
         if res.status_code == 200:
             with open('drive_folder', 'wb+') as f:
                 f.write(res.content)
@@ -516,7 +493,7 @@ try:
         else:
             logging.error(f"Failed to download drive_folder, link got HTTP response: {res.status_code}")
     except Exception as e:
-        logging.error(str(e))
+        logging.error(f"MULTI_SEARCH_URL: {e}")
 except KeyError:
     pass
 try:
@@ -524,7 +501,7 @@ try:
     if len(YT_COOKIES_URL) == 0:
         raise KeyError
     try:
-        res = requests.get(YT_COOKIES_URL)
+        res = rget(YT_COOKIES_URL)
         if res.status_code == 200:
             with open('cookies.txt', 'wb+') as f:
                 f.write(res.content)
@@ -532,19 +509,13 @@ try:
         else:
             logging.error(f"Failed to download cookies.txt, link got HTTP response: {res.status_code}")
     except Exception as e:
-        logging.error(str(e))
-except KeyError:
-    pass
-try:
-    BOT_NO = getConfig('BOT_NO')
-    if len(BOT_NO) == 0:
-        BOT_NO = None
+        logging.error(f"YT_COOKIES_URL: {e}")
 except KeyError:
     pass
 
 DRIVES_NAMES.append("Main")
 DRIVES_IDS.append(parent_id)
-if os.path.exists('drive_folder'):
+if ospath.exists('drive_folder'):
     with open('drive_folder', 'r+') as f:
         lines = f.readlines()
         for line in lines:
@@ -562,7 +533,7 @@ try:
     SEARCH_PLUGINS = getConfig('SEARCH_PLUGINS')
     if len(SEARCH_PLUGINS) == 0:
         raise KeyError
-    SEARCH_PLUGINS = json.loads(SEARCH_PLUGINS)
+    SEARCH_PLUGINS = jsnloads(SEARCH_PLUGINS)
     qbclient = get_client()
     qb_plugins = qbclient.search_plugins()
     if qb_plugins:
@@ -573,6 +544,7 @@ try:
 except KeyError:
     SEARCH_PLUGINS = None
 
-updater = tg.Updater(token=BOT_TOKEN, request_kwargs={'read_timeout': 30, 'connect_timeout': 15})
+updater = tg.Updater(token=BOT_TOKEN)
 bot = updater.bot
 dispatcher = updater.dispatcher
+job_queue = updater.job_queue
