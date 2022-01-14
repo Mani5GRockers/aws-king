@@ -244,6 +244,15 @@ except KeyError:
     MEGA_EMAIL_ID = None
     MEGA_PASSWORD = None
 try:
+    HEROKU_API_KEY = getConfig('HEROKU_API_KEY')
+    HEROKU_APP_NAME = getConfig('HEROKU_APP_NAME')
+    if len(HEROKU_API_KEY) == 0 or len(HEROKU_APP_NAME) == 0:
+        HEROKU_API_KEY = None
+        HEROKU_APP_NAME = None
+except KeyError:
+    HEROKU_API_KEY = None
+    HEROKU_APP_NAME = None
+try:
     UPTOBOX_TOKEN = getConfig('UPTOBOX_TOKEN')
     if len(UPTOBOX_TOKEN) == 0:
         raise KeyError
@@ -385,6 +394,30 @@ try:
 except KeyError:
     SHORTENER = None
     SHORTENER_API = None
+try:
+    TIMEZONE = getConfig('TIMEZONE')
+    if len(TIMEZONE) == 0:
+        TIMEZONE = None
+except KeyError:
+    TIMEZONE = 'Asia/Kuala_Lumpur'
+try:
+    BOT_USERNAME = getConfig('BOT_USERNAME')
+    if len(BOT_USERNAME) == 0:
+        BOT_USERNAME = None
+except KeyError:
+    BOT_USERNAME = '@pmirror1_bot'
+try:
+    BOT_NAME = getConfig('BOT_NAME')
+    if len(BOT_NAME) == 0:
+        BOT_NAME = None
+except KeyError:
+    BOT_NAME = 'P-Mιɾɾσɾ-1'
+try:
+    IMAGE_URL = getConfig('IMAGE_URL')
+    if len(IMAGE_URL) == 0:
+        IMAGE_URL = None
+except KeyError:
+    IMAGE_URL = 'https://telegra.ph/file/b5d9a2910d65ce0596f59.jpg'
 try:
     FINISHED_PROGRESS_STR = getConfig('FINISHED_PROGRESS_STR')
     if len(FINISHED_PROGRESS_STR) == 0:
