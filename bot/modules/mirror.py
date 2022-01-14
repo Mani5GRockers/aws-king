@@ -511,6 +511,8 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
         bot_start = f"http://t.me/{b_uname}?start=start"
         Thread(target=add_aria2c_download, args=(link, f'{DOWNLOAD_DIR}{listener.uid}/', listener, name)).start()
         sendStatusMessage(update, bot)
+        editMessage(f"<b>Hei {uname}</b>\n\n<b>Your Requested Torrent File Has Been Added To The Status</b>\n\n<b>Use /{BotCommands.StatusCommand} To Check Your Progress</b>\n")
+        time.sleep(1)
         sendtextlog(f"𝗟𝗢𝗚𝗚𝗘𝗥\n\n𝑼𝒔𝒆𝒓: {uname}\n𝑼𝒔𝒆𝒓 𝑰𝑫: {uid}\n\n𝑳𝒊𝒏𝒌 𝑺𝒆𝒏𝒅𝒆𝒅:\n<code>{link}</code>", bot, update)
         
     
