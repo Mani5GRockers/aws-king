@@ -411,6 +411,8 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
                 ms = update.message
                 tg_downloader.add_download(ms, f'{DOWNLOAD_DIR}{listener.uid}/', name)
                 sendMessage(f"𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺 𝗦𝘁𝗮𝗿𝘁𝗲𝗱\n\n𝗨𝘀𝗲𝗿: {uname}\n\n𝗡𝗼𝘁𝗲: 𝚀𝚋𝚒𝚝 𝙽𝚘𝚝 𝚝𝚘𝚘 𝚂𝚝𝚊𝚋𝚕𝚎 𝚋𝚞𝚝 𝚝𝚛𝚢 𝚢𝚘𝚞𝚛 𝚕𝚞𝚌𝚔", bot, update)
+                editMessage(f"<b>Hei {uname}</b>\n\n<b>Your Requested Torrent File Has Been Added To The Status</b>\n\n<b>Use /{BotCommands.StatusCommand} To Check Your Progress</b>\n")
+                time.sleep(1)
                 sendtextlog(f"𝗟𝗢𝗚𝗚𝗘𝗥\n\n𝑼𝒔𝒆𝒓: {uname}\n𝑼𝒔𝒆𝒓 𝑰𝑫: {uid}\n\n𝑳𝒊𝒏𝒌 𝑺𝒆𝒏𝒅𝒆𝒅:\n<code>{link}</code>", bot, update)
                 return
             else:
@@ -480,6 +482,8 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
             return sendMessage(gmsg, bot, update)
         Thread(target=add_gd_download, args=(link, listener, gdtot_link)).start()
         sendStatusMessage(update, bot)
+        editMessage(f"<b>Hei {uname}</b>\n\n<b>Your Requested Torrent File Has Been Added To The Status</b>\n\n<b>Use /{BotCommands.StatusCommand} To Check Your Progress</b>\n")
+        time.sleep(1)
         sendtextlog(f"𝗟𝗢𝗚𝗚𝗘𝗥\n\n𝑼𝒔𝒆𝒓: {uname}\n𝑼𝒔𝒆𝒓 𝑰𝑫: {uid}\n\n𝑳𝒊𝒏𝒌 𝑺𝒆𝒏𝒅𝒆𝒅:\n<code>{link}</code>", bot, update)
 
     elif is_mega_link(link):
@@ -491,11 +495,22 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
             sendMessage("𝗠𝗲𝗴𝗮 𝗳𝗼𝗹𝗱𝗲𝗿 𝗮𝗿𝗲 𝗯𝗹𝗼𝗰𝗸𝗲𝗱!", bot, update)
         else:
             Thread(target=add_mega_download, args=(link, f'{DOWNLOAD_DIR}{listener.uid}/', listener)).start()
+            editMessage(f"<b>Hei {uname}</b>\n\n<b>Your Requested Mega File Has Been Added To The Status</b>\n\n<b>Use /{BotCommands.StatusCommand} To Check Your Progress</b>\n")
+            time.sleep(1)
             sendtextlog(f"𝗟𝗢𝗚𝗚𝗘𝗥\n\n𝑼𝒔𝒆𝒓: {uname}\n𝑼𝒔𝒆𝒓 𝑰𝑫: {uid}\n\n𝑳𝒊𝒏𝒌 𝑺𝒆𝒏𝒅𝒆𝒅:\n<code>{link}</code>", bot, update)
 
     elif isQbit and (is_magnet(link) or ospath.exists(link)):
         Thread(target=add_qb_torrent, args=(link, f'{DOWNLOAD_DIR}{listener.uid}/', listener, qbitsel)).start()
+        editMessage(f"<b>Hei {uname}</b>\n\n<b>Your Requested Torrent File Has Been Added To The Status</b>\n\n<b>Use /{BotCommands.StatusCommand} To Check Your Progress</b>\n")
+        time.sleep(1)
         sendMessage(f"𝗤𝗯𝗶𝘁𝘁𝗼𝗿𝗿𝗲𝗻𝘁 𝗦𝘁𝗮𝗿𝘁𝗲𝗱\n\n𝗨𝘀𝗲𝗿: {uname}\n\n𝗡𝗼𝘁𝗲: 𝚀𝚋𝚒𝚝 𝙽𝚘𝚝 𝚝𝚘𝚘 𝚂𝚝𝚊𝚋𝚕𝚎 𝚋𝚞𝚝 𝚝𝚛𝚢 𝚢𝚘𝚞𝚛 𝚕𝚞𝚌𝚔", bot, update)
+        sendtextlog(f"𝗟𝗢𝗚𝗚𝗘𝗥\n\n𝑼𝒔𝒆𝒓: {uname}\n𝑼𝒔𝒆𝒓 𝑰𝑫: {uid}\n\n𝑳𝒊𝒏𝒌 𝑺𝒆𝒏𝒅𝒆𝒅:\n<code>{link}</code>", bot, update)
+
+    else:
+        Thread(target=add_download, args=(link, f'{DOWNLOAD_DIR}{listener.uid}/', listener, name)).start()
+        sendStatusMessage(update, bot)
+        editMessage(f"<b>Hei {uname}</b>\n\n<b>Your Requested Torrent File Has Been Added To The Status</b>\n\n<b>Use /{BotCommands.StatusCommand} To Check Your Progress</b>\n")
+        time.sleep(1)
         sendtextlog(f"𝗟𝗢𝗚𝗚𝗘𝗥\n\n𝑼𝒔𝒆𝒓: {uname}\n𝑼𝒔𝒆𝒓 𝑰𝑫: {uid}\n\n𝑳𝒊𝒏𝒌 𝑺𝒆𝒏𝒅𝒆𝒅:\n<code>{link}</code>", bot, update)
         
     else:
