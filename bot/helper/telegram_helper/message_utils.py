@@ -178,7 +178,6 @@ def sendStatusMessage(msg, bot):
             except Exception as e:
                 LOGGER.error(str(e))
                 del status_reply_dict[msg.message.chat.id]
-                pass
         if len(progress) == 0:
             progress = "Starting DL"
         message = sendMessage(progress, bot, msg)
@@ -217,7 +216,7 @@ def bot_sys_stats():
     free = get_readable_file_size(free)
     recv = get_readable_file_size(psutil.net_io_counters().bytes_recv)
     sent = get_readable_file_size(psutil.net_io_counters().bytes_sent)
-    stats = f"""
+    return f"""
 BOT UPTIME 🕐 :
 CPU : {progress_bar(cpu)} {cpu}%
 RAM : {progress_bar(mem)} {mem}%
@@ -226,7 +225,6 @@ TOTAL : {total}
 USED : {used} || FREE : {free}
 SENT : {sent} || RECV : {recv}
 """
-    return stats
 
 dispatcher.add_handler(CallbackQueryHandler(refresh, pattern='^' + str(ONE) + '$'))
 dispatcher.add_handler(CallbackQueryHandler(close, pattern='^' + str(TWO) + '$'))
