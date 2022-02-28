@@ -104,11 +104,8 @@ def getAllDownload():
 def progress_bar(percentage):
     """Returns a progress bar for download
     """
-    #percentage is on the scale of 0-1
     comp = FINISHED_PROGRESS_STR
     ncomp = UNFINISHED_PROGRESS_STR
-    pr = ""
-
     if isinstance(percentage, str):
         return "NaN"
 
@@ -117,12 +114,7 @@ def progress_bar(percentage):
     except:
         percentage = 0
 
-    for i in range(1,11):
-        if i <= int(percentage/10):
-            pr += comp
-        else:
-            pr += ncomp
-    return pr
+    return "".join(comp if i <= percentage // 10 else ncomp for i in range(1,11))
 
 def get_progress_bar_string(status):
     completed = status.processed_bytes() / 8
@@ -160,7 +152,7 @@ def get_readable_message():
                 globals()['PAGE_NO'] -= 1
             START = COUNT
         for index, download in enumerate(list(download_dict.values())[START:], start=1):
-            msg += f"<b>════════════════════════════════</b>\n\n"
+            msg += '<b>════════════════════════════════</b>\n\n'
             msg += f"<b>➜ Filename :</b> <code>{download.name()}</code>"
             msg += f"\n<b>➜ Status :</b> <i>{download.status()}</i>"
             if download.status() not in [
